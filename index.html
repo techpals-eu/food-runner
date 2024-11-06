@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Run Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        canvas {
+            background-color: #8fc0a9;
+            border: 2px solid #333;
+        }
+        #game-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="300"></canvas>
+    <div id="game-info">
+        <p>Health: <span id="health">10</span></p>
+    </div>
+
+    <script>
+        // Game setup
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let health = 10;
+        const healthDisplay = document.getElementById("health");
+
+        // Player setup (using a human emoji)
+        const player = {
+            x: 50,
+            y: canvas.height - 50,
+            width: 30, // Approximate size of emoji
+            height: 30,
+            emoji: "🧑", // Human emoji
+            speed: 3,
+            isJumping: false,
+            jumpSpeed: 0,
+            gravity: 0.5
+        };
+
+        // Emojis for foods
+        const goodFoods = ["🥦", "🐟", "🥔", "🫒", "🧅", "🍠", "🍅", "🌰", "🍲", "🍆", "🍗", "🌿"];
+        const badFoods = ["🍔", "🥩", "🍬", "🍖", "🥐", "🥤", "🍰", "🍩"];
+
+        // Track
+        let trackSpeed = 2;
+        let trackLength = 6000; // Move for approx 1 minute at 60fps
+        let trackProgress = 0;
+
+        // Prize
+        const prize = { x: trackLength - 100, y: canvas.height - 50, width: 30, height: 30, color: "#ffd700" };
+
+        // Keyboard controls
+        const keys = {};
+
+        document.addEventListener("keydown", (e) => {
+            keys[e.key] = true;
+
+            if (e.code === "Space" && !player.isJumping) {
+                player.isJumping = true;
+                player.jumpSpeed = -10;
+            }
+        });
+
+        document.addEventListener("keyup", (e) => {
+            keys[e.key] = false;
+        });
+
+        // Create food items randomly
+        function createFood() {
+            const isGoodFood = Math.random() > 0.5; // 50% chance for good or bad food
+            const emoji = isGoodFood
+                ? goodFoods[Math.floor(Math.random() * goodFoods.length)]
+                : badFoods[Math.floor(Math.random() * badFoods.length)];
+            foods.push({
+                x: canvas.width + Math.random() * 300,
+                y: Math.random() * (canvas.height - 30), // Random y position within canvas
+                emoji: emoji,
+                effect: isGoodFood ? 1 : -2
+            });
+        }
+
+        // Food items array
+        const foods = [];
+
+        // Game update
+        function updateGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Update player movement based on key presses
+            if (keys["ArrowUp"] || keys["w"]) player.y = Math.max(0, player.y - player.speed);
+            if (keys["ArrowDown"] || keys["s"]) player.y = Math.min(canvas.height - player.height, player.y + player.speed);
+
+            // Apply jump physics
+            if (player.isJumping) {
+                player.y += player.jumpSpeed;
+                player.jumpSpeed += player.gravity;
+                if (player.y >= canvas.height - player.height) {
+                    player.y = canvas.height - player.height;
+                    player.isJumping = false;
+                }
+            }
+
+            // Move track
+            trackProgress += trackSpeed;
+            if (trackProgress >= trackLength) {
+                alert("Congratulations! You reached the prize!");
+                resetGame();
+                return;
+            }
+
+            // Generate food
+            if (Math.random() < 0.03) createFood();
+
+            // Update foods
+            foods.forEach((food, index) => {
+                food.x -= trackSpeed;
+
+                // Collision detection
+                if (food.x < player.x + player.width &&
+                    food.x + 30 > player.x && // Approximate width of emoji
+                    food.y < player.y + player.height &&
+                    food.y + 30 > player.y) { // Approximate height of emoji
+                        health += food.effect;
+                        foods.splice(index, 1);
+                }
+
+                // Remove food if it goes off screen
+                if (food.x < -30) { // Approximate width of emoji
+                    foods.splice(index, 1);
+                }
+            });
+
+            // Draw prize
+            if (trackProgress >= trackLength - canvas.width) {
+                ctx.fillStyle = prize.color;
+                ctx.fillRect(prize.x - trackProgress + canvas.width, prize.y, prize.width, prize.height);
+            }
+
+            // Draw player as an emoji
+            ctx.font = "30px Arial";
+            ctx.fillText(player.emoji, player.x, player.y + player.height);
+
+            // Draw foods as larger emojis
+            foods.forEach((food) => {
+                ctx.font = "30px Arial";
+                ctx.fillText(food.emoji, food.x, food.y + 30); // Draw emoji with larger size
+            });
+
+            // Update health display
+            healthDisplay.textContent = health;
+
+            // Game over condition
+            if (health <= 0) {
+                alert("Game Over! Try again.");
+                resetGame();
+            } else {
+                requestAnimationFrame(updateGame);
+            }
+        }
+
+        // Reset game
+        function resetGame() {
+            health = 10;
+            foods.length = 0;
+            trackProgress = 0;
+            updateGame();
+        }
+
+        // Start game
+        updateGame();
+    </script>
+</body>
+</html>
+
