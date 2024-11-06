@@ -12,6 +12,7 @@
             height: 100vh;
             margin: 0;
             background-color: #f4f4f4;
+            position: relative;
         }
         canvas {
             background-color: #8fc0a9;
@@ -24,6 +25,19 @@
             color: #333;
             font-family: Arial, sans-serif;
         }
+        #restartButton {
+            display: none;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -31,6 +45,7 @@
     <div id="game-info">
         <p>Health: <span id="health">10</span></p>
     </div>
+    <button id="restartButton" onclick="resetGame()">Restart</button>
 
     <script>
         // Game setup
@@ -38,7 +53,9 @@
         const ctx = canvas.getContext("2d");
 
         let health = 10;
+        let gameOver = false; // Flag to stop the game when reaching the prize
         const healthDisplay = document.getElementById("health");
+        const restartButton = document.getElementById("restartButton");
 
         // Player setup (using a human emoji)
         const player = {
@@ -59,7 +76,7 @@
 
         // Track
         let trackSpeed = 2;
-        const trackSpeedIncrement = 0.005; // Small increment to gradually increase speed
+        const trackSpeedIncrement = 0.001; // Small increment to gradually increase speed
         const trackLength = 6000; // Move for approx 1 minute at 60fps
         let trackProgress = 0;
 
@@ -106,6 +123,8 @@
 
         // Game update
         function updateGame() {
+            if (gameOver) return; // Stop the game if it's over
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Update player movement based on key presses
@@ -127,8 +146,7 @@
             if (trackProgress >= trackLength) {
                 // Check if player reaches the prize
                 if (player.x + player.width >= prize.x - trackProgress + canvas.width && player.y + player.height >= prize.y) {
-                    alert("Congratulations! You've reached the prize!");
-                    resetGame();
+                    endGame();
                     return;
                 }
             }
@@ -186,12 +204,21 @@
             }
         }
 
+        // End game when reaching the prize
+        function endGame() {
+            gameOver = true;
+            alert("Congratulations! You've reached the prize!");
+            restartButton.style.display = "block"; // Show restart button
+        }
+
         // Reset game
         function resetGame() {
             health = 10;
             foods.length = 0;
             trackProgress = 0;
             trackSpeed = 2; // Reset track speed to initial value
+            gameOver = false; // Reset game over flag
+            restartButton.style.display = "none"; // Hide restart button
             updateGame();
         }
 
