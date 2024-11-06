@@ -18,13 +18,6 @@
             background-color: #8fc0a9;
             border: 2px solid #333;
         }
-        #game-info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #333;
-            font-family: Arial, sans-serif;
-        }
         #restartButton {
             display: none;
             position: absolute;
@@ -42,9 +35,6 @@
 </head>
 <body>
     <canvas id="gameCanvas" width="600" height="300"></canvas>
-    <div id="game-info">
-        <p>Health: <span id="health">10</span></p>
-    </div>
     <button id="restartButton" onclick="resetGame()">Restart</button>
 
     <script>
@@ -54,7 +44,6 @@
 
         let health = 10;
         let gameOver = false; // Flag to stop the game when reaching the prize
-        const healthDisplay = document.getElementById("health");
         const restartButton = document.getElementById("restartButton");
 
         // Player setup (using a human emoji)
@@ -192,8 +181,10 @@
                 ctx.fillText(food.emoji, food.x, food.y + 30); // Draw emoji with larger size
             });
 
-            // Update health display
-            healthDisplay.textContent = health;
+            // Draw health inside canvas
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "#333";
+            ctx.fillText(`Health: ${health}`, 10, 30);
 
             // Game over condition
             if (health <= 0) {
