@@ -13,29 +13,39 @@
             margin: 0;
             background-color: #f4f4f4;
             position: relative;
+            flex-direction: column;
         }
         canvas {
             background-color: #8fc0a9;
             border: 2px solid #333;
         }
-        #restartButton {
+        #restartButton, #gameSummary {
             display: none;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
             padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #333;
             color: #fff;
             border: none;
             border-radius: 5px;
+        }
+        #restartButton {
+            margin-top: -265px;
+            padding: 10px 20px;
+            font-size: 16px;
+            text-align: center;
+            background-color: #333;
+        }
+        #gameSummary {
+            margin-top: 10px;
+            font-size: 16px;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #333;
         }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="600" height="300"></canvas>
     <button id="restartButton" onclick="resetGame()">Restart</button>
+    <div id="gameSummary"></div>
 
     <script>
         // Game setup
@@ -44,7 +54,11 @@
 
         let health = 10;
         let gameOver = false; // Flag to stop the game when reaching the prize
+        let goodFoodsEaten = 0;
+        let badFoodsEaten = 0;
+        
         const restartButton = document.getElementById("restartButton");
+        const gameSummary = document.getElementById("gameSummary");
 
         // Player setup (using a human emoji)
         const player = {
@@ -156,6 +170,8 @@
                     food.y < player.y + player.height &&
                     food.y + 30 > player.y) { // Approximate height of emoji
                         health += food.effect;
+                        if (food.effect > 0) goodFoodsEaten++;
+                        else badFoodsEaten++;
                         foods.splice(index, 1);
                 }
 
@@ -191,6 +207,7 @@
                 alert("Game Over! Try again.");
                 resetGame();
             } else {
+                // runs the game
                 requestAnimationFrame(updateGame);
             }
         }
@@ -198,18 +215,32 @@
         // End game when reaching the prize
         function endGame() {
             gameOver = true;
-            alert("Congratulations! You've reached the prize!");
+            displaySummary();
             restartButton.style.display = "block"; // Show restart button
+        }
+
+        // Display game summary
+        function displaySummary() {
+            gameSummary.innerHTML = `
+                <p>Game Summary:</p>
+                <p>Good foods eaten: ${goodFoodsEaten}</p>
+                <p>Bad foods eaten: ${badFoodsEaten}</p>
+                <p>Final health: ${health}</p>
+            `;
+            gameSummary.style.display = "block"; // Show summary
         }
 
         // Reset game
         function resetGame() {
             health = 10;
+            goodFoodsEaten = 0;
+            badFoodsEaten = 0;
             foods.length = 0;
             trackProgress = 0;
             trackSpeed = 2; // Reset track speed to initial value
             gameOver = false; // Reset game over flag
             restartButton.style.display = "none"; // Hide restart button
+            gameSummary.style.display = "none"; // Hide summary
             updateGame();
         }
 
