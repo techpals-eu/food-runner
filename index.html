@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,7 +43,7 @@
 </head>
 <body>
     <canvas id="gameCanvas" width="600" height="300"></canvas>
-    <button id="restartButton" onclick="resetGame()">Restart</button>
+    <button id="restartButton" onclick="resetGame()">Επανεκκίνηση</button>
     <div id="gameSummary"></div>
 
     <script>
@@ -199,7 +199,7 @@
             // Draw health inside canvas
             ctx.font = "20px Arial";
             ctx.fillStyle = "#333";
-            ctx.fillText(`Health: ${health}`, 10, 30);
+            ctx.fillText(`Υγεία: ${health}`, 10, 30);
 
             // Game over condition
             if (health <= 0) {
@@ -221,10 +221,9 @@
         // Display game summary
         function displaySummary() {
             gameSummary.innerHTML = `
-                <p>Game Summary:</p>
-                <p>Good foods eaten: ${goodFoodsEaten}</p>
-                <p>Bad foods eaten: ${badFoodsEaten}</p>
-                <p>Final health: ${health}</p>
+                <p>Καλές τροφές: ${goodFoodsEaten}</p>
+                <p>Κακές τροφές: ${badFoodsEaten}</p>
+                <p>Υγεία: ${health}</p>
             `;
             gameSummary.style.display = "block"; // Show summary
         }
