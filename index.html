@@ -59,7 +59,8 @@
 
         // Track
         let trackSpeed = 2;
-        let trackLength = 6000; // Move for approx 1 minute at 60fps
+        const trackSpeedIncrement = 0.005; // Small increment to gradually increase speed
+        const trackLength = 6000; // Move for approx 1 minute at 60fps
         let trackProgress = 0;
 
         // Prize
@@ -132,6 +133,9 @@
                 }
             }
 
+            // Gradually increase the track speed over time
+            trackSpeed += trackSpeedIncrement;
+
             // Generate food
             if (Math.random() < 0.03) createFood();
 
@@ -187,6 +191,7 @@
             health = 10;
             foods.length = 0;
             trackProgress = 0;
+            trackSpeed = 2; // Reset track speed to initial value
             updateGame();
         }
 
