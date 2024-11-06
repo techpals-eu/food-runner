@@ -63,7 +63,12 @@
         let trackProgress = 0;
 
         // Prize
-        const prize = { x: trackLength - 100, y: canvas.height - 50, width: 30, height: 30, color: "#ffd700" };
+        const prize = { 
+            x: trackLength - 100, 
+            y: canvas.height - 100, 
+            emoji: "🏆", // Prize emoji
+            size: 50 // Large size for the prize
+        };
 
         // Keyboard controls
         const keys = {};
@@ -119,9 +124,12 @@
             // Move track
             trackProgress += trackSpeed;
             if (trackProgress >= trackLength) {
-                alert("Congratulations! You reached the prize!");
-                resetGame();
-                return;
+                // Check if player reaches the prize
+                if (player.x + player.width >= prize.x - trackProgress + canvas.width && player.y + player.height >= prize.y) {
+                    alert("Congratulations! You've reached the prize!");
+                    resetGame();
+                    return;
+                }
             }
 
             // Generate food
@@ -146,10 +154,10 @@
                 }
             });
 
-            // Draw prize
+            // Draw prize as a large emoji
             if (trackProgress >= trackLength - canvas.width) {
-                ctx.fillStyle = prize.color;
-                ctx.fillRect(prize.x - trackProgress + canvas.width, prize.y, prize.width, prize.height);
+                ctx.font = `${prize.size}px Arial`;
+                ctx.fillText(prize.emoji, prize.x - trackProgress + canvas.width, prize.y + prize.size);
             }
 
             // Draw player as an emoji
