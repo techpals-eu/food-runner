@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Run Game</title>
+    <title>Παιχνίδι Υγείας</title>
     <style>
         body {
             display: flex;
@@ -46,10 +46,29 @@
     <button id="restartButton" onclick="resetGame()">Επανεκκίνηση</button>
     <div id="gameSummary"></div>
 
+    <!-- Sound files -->
+    <audio id="backgroundSound" src="background.mp3" loop></audio>
+    <audio id="gameFinishedSound" src="game_finished.mp3"></audio>
+    <audio id="gameOverSound" src="game_over.mp3"></audio>
+    <audio id="jumpSound" src="jump.mp3"></audio>
+    <audio id="goodFoodSound" src="good_food.mp3"></audio>
+    <audio id="badFoodSound" src="bad_food.mp3"></audio>
+
     <script>
         // Game setup
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+
+        // Sound elements
+        const backgroundSound = document.getElementById("backgroundSound");
+        const gameFinishedSound = document.getElementById("gameFinishedSound");
+        const gameOverSound = document.getElementById("gameOverSound");
+        const jumpSound = document.getElementById("jumpSound");
+        const goodFoodSound = document.getElementById("goodFoodSound");
+        const badFoodSound = document.getElementById("badFoodSound");
+
+        // Start background music
+        backgroundSound.play();
 
         let health = 10;
         let gameOver = false; // Flag to stop the game when reaching the prize
@@ -99,6 +118,7 @@
             if (e.code === "Space" && !player.isJumping) {
                 player.isJumping = true;
                 player.jumpSpeed = -10;
+                jumpSound.play(); // Play jump sound
             }
         });
 
@@ -169,8 +189,14 @@
                     food.y < player.y + player.height &&
                     food.y + 30 > player.y) { // Approximate height of emoji
                         health += food.effect;
-                        if (food.effect > 0) goodFoodsEaten++;
-                        else badFoodsEaten++;
+                        if (food.effect > 0) { 
+                          goodFoodsEaten++; 
+                          goodFoodSound.play();
+                        }
+                        else { 
+                          badFoodsEaten++; 
+                          badFoodSound.play();
+                        }
                         foods.splice(index, 1);
                 }
 
@@ -203,6 +229,7 @@
 
             // Game over condition
             if (health <= 0) {
+                gameOverSound.play(); // Play game over sound
                 alert("Game Over! Try again.");
                 resetGame();
             } else {
@@ -214,6 +241,8 @@
         // End game when reaching the prize
         function endGame() {
             gameOver = true;
+            backgroundSound.pause(); // Stop background music
+            gameFinishedSound.play(); // Play game finished sound
             displaySummary();
             restartButton.style.display = "block"; // Show restart button
         }
@@ -239,6 +268,7 @@
             gameOver = false; // Reset game over flag
             restartButton.style.display = "none"; // Hide restart button
             gameSummary.style.display = "none"; // Hide summary
+            backgroundSound.play(); // Restart background music
             updateGame();
         }
 
